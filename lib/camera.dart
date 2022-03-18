@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so that `availableCameras()`
@@ -97,7 +98,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
             // Attempt to take a picture and get the file `image`
             // where it was saved.
-            final image = await _controller.takePicture;
+            final path = join(
+              // Store the picture in the temp directory.
+              // Find the temp directory using the `path_provider` plugin.
+              (await getTemporaryDirectory()).path,
+              '${DateTime.now()}.png',
+            );
+            final image = await _controller.takePicture(path);
 
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
@@ -105,8 +112,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                 builder: (context) => DisplayPictureScreen(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-       
+                  imagePath: path,
                 ),
               ),
             );
